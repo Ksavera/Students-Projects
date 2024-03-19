@@ -4,14 +4,14 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreStudentRequest extends FormRequest
+class ProjectUpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,10 @@ class StoreStudentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'name' => 'nullable|string|between:3,255',
+            'project_photo' => 'nullable|file|mimes:jpg,png,jpeg|max:20000',
+            'description' => 'nullable|string|between:3,600',
+            'github' => 'nullable|string|between:3,600'
         ];
     }
 }

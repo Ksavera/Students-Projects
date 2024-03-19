@@ -8,12 +8,12 @@ use Illuminate\Database\Eloquent\Model;
 class Project extends Model
 {
     use HasFactory;
-    protected $fillable = ['name', 'photo', 'description', 'github', 'student_id'];
+    protected $fillable = ['name', 'project_photo', 'description', 'github', 'user_id'];
 
 
 
-    public function student()
+    public function user()
     {
-        return $this->belongsTo(Student::class, 'student_id');
+        return $this->belongsTo(User::class, 'user_id');
     }
 }

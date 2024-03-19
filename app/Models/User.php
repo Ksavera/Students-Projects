@@ -21,8 +21,42 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-    ];
+        'last_name',
+        'about',
+        'skills',
+        'linkedin',
+        'github',
+        'phone',
+        'category',
+        'location',
+        'views',
+        'profile_photo'
 
+    ];
+    public static $categories = ['designer', 'programmer'];
+    public static $locations = [
+        "Vilnius",
+        "Kaunas",
+        "Klaipėda",
+        "Šiauliai",
+        "Panevėžys",
+        "Alytus",
+        "Marijampolė",
+        "Mazeikiai",
+        "Jonava",
+        "Utena",
+        "Kėdainiai",
+        "Telšiai",
+        "Visaginas",
+        "Tauragė",
+        "Ukmergė",
+        "Plungė",
+        "Šilutė",
+        "Kretinga",
+        "Radviliškis",
+        "Palanga",
+        "Neringa"
+    ];
     /**
      * The attributes that should be hidden for serialization.
      *
@@ -43,8 +77,8 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
-    public function student()
+    public function projects()
     {
-        return $this->hasOne(Student::class . 'user_id');
+        return $this->hasMany(Project::class, 'user_id');
     }
 }
