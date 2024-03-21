@@ -13,7 +13,7 @@
             <div class="hidden sm:flex sm:items-center sm:space-x-4">
                 <ul class="flex gap-2 items-center text-sm text-gray-600">
                     <li><a href="/">Home</a></li>
-                    <li><a href="{{ route('students.index') }}">Students</a></li>
+                    <li><a href="{{ route('profiles.index') }}">Students</a></li>
                     <li><a href="{{ route('projects.index') }}">Projects</a></li>
                     <li><a href="#">About</a></li>
                     <li><a href="#">Contacts</a></li>

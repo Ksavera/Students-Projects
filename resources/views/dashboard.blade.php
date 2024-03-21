@@ -14,7 +14,7 @@
 
 
 <h1 class="text-center my-12">Users Dashboard where will be displayed his profile info and projects</h1>
-@if(!isset($profile))
+@if(!isset($profile) && auth())
 <p>There is no profile created.</p>
 <a href="{{route('profiles.create')}}" class="text-red-500">Create Profile</a>
 
@@ -45,11 +45,13 @@
         <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
             <div class="max-w-xl">
                 <div>
+                    @if(auth()->check() && Route::currentRouteName() === 'profiles.index')
                     <div class="mb-8 flex justify-center">
                         <x-primary-button class="bg-blue-200">
                             <a href="{{route('projects.create', ['profile'=>$profile])}}">Create project</a>
                         </x-primary-button>
                     </div>
+                    @endif
                     <section>
                         <div>
                             <h2 class="my-12 text-2xl text-center">Projects:</h2>

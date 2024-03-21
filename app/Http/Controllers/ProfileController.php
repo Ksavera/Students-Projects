@@ -16,7 +16,8 @@ class ProfileController extends Controller
      */
     public function index()
     {
-        //
+        $profiles = Profile::all();
+        return view('profiles.index', compact('profiles'));
     }
 
     /**
@@ -51,10 +52,11 @@ class ProfileController extends Controller
         }
     }
 
-    public function show(User $user, Profile $profile)
+    public function show(Profile $profile)
     {
-        $profile = auth()->user()->profile;
-        return view('dashboard', compact('user', 'profile'));
+        $projects = $profile->projects()->get();
+        $profile->increment('views');
+        return view('dashboard', compact('projects', 'profile'));
     }
 
 

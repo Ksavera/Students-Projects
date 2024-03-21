@@ -13,8 +13,13 @@ class DashboardController extends Controller
 
     {
         $profile = auth()->user()->profile;
-        $projects = $profile->projects;
+        if (isset($profile)) {
+            $projects = $profile->projects;
+        } else {
+            $projects = null;
+        }
 
-        return view('dashboard', compact('profile', 'projects'));
+
+        return view('dashboard', compact('projects', 'profile'));
     }
 }

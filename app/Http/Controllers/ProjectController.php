@@ -69,7 +69,7 @@ class ProjectController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(ProjectUpdateRequest $request, Project $project)
+    public function update(ProjectUpdateRequest $request, Project $project, Profile $profile)
     {
         $validatedData = $request->validated();
 
@@ -87,10 +87,10 @@ class ProjectController extends Controller
         // Assuming you have a $student variable available, you can retrieve the student from the project
         $user = $project->user;
 
-        $successMessage = 'Congratulations, ' . $user->name . '! Your project was updated';
+        $successMessage = 'Congratulations, ' . $profile->name . '! Your project was updated';
 
         return redirect()
-            ->route('projects.show', compact('project', 'user'))
+            ->route('projects.show', compact('project', 'profile'))
             ->with('success', $successMessage);
     }
 
