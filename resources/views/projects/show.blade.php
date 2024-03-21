@@ -11,7 +11,7 @@
     <h1 class="space-y-5 my-8 text-center text-2xl">Project's info:</h1>
     <div class="flex justify-center my-8 gap-4">
         <x-secondary-button>
-            <a href="{{route('projects.edit', compact('student', 'project'))}}">Edit</a>
+            <a href="{{route('projects.edit', compact('profile', 'project'))}}">Edit</a>
         </x-secondary-button>
 
 

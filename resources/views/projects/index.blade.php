@@ -1,6 +1,5 @@
 @extends('layouts.app')
 @section('content')
-
 <div>
     <h2 class="my-12 text-2xl text-center">Projects:</h2>
     <div class="grid grid-cols-4 gap-4">
@@ -10,9 +9,8 @@
             <h3 class="text-center">{{ $project->name}}</h3>
         </div>
         @empty
-        <p>there is no projects yet.</p>
-        @endforelse
     </div>
+    <p class="text-center text-red-600">there is no projects created yet.</p>
+    @endforelse
 </div>
-
 @endsection

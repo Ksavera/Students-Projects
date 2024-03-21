@@ -14,10 +14,10 @@ return new class extends Migration
         Schema::create('projects', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('project_photo');
+            $table->string('project_photo')->nullable();
             $table->string('description');
             $table->string('github');
-            $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('cascade')->onUpdate('cascade');
+            $table->foreignId('profile_id')->nullable()->constrained('profiles')->onDelete('cascade')->onUpdate('cascade');
             $table->timestamps();
         });
     }

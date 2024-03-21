@@ -2,70 +2,99 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ProfileStoreRequest;
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Models\Profile;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Redirect;
-use Illuminate\View\View;
 
 class ProfileController extends Controller
 {
-
-
-
-    public function edit(Request $request): View
+    /**
+     * Display a listing of the resource.
+     */
+    public function index()
     {
-        return view('profile.edit', [
-            'user' => $request->user(),
-        ]);
+        //
     }
 
     /**
-     * Update the user's profile information.
+     * Show the form for creating a new resource.
      */
-    public function update(ProfileUpdateRequest $request, User $student): RedirectResponse
+    public function create()
     {
-        $request->user()->fill($request->validated());
-        $request->user()->views = 0;
-        $categories = User::$categories;
-        $locations = User::$locations;
+        return view('profiles.create');
+    }
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(ProfileStoreRequest $request, User $user)
+    { {
+            $validatedData = $request->validated();
+            $validatedData['user_id'] = auth()->user()->id;
+
+            if ($request->hasFile('profile_photo')) {
+                $photoPath = $request->file('profile_photo')->store('profiles', 'public');
+
+                $validatedData['profile_photo'] = $photoPath;
+            }
+
+            $profile = Profile::create($validatedData);
+
+            $successMessage = 'Congratulations, ' . $user->name . '! Your profile was created';
+
+            return redirect()
+                ->route('profiles.show', compact('user', 'profile'))
+                ->with('success', $successMessage);
         }
+    }
+
+    public function show(User $user, Profile $profile)
+    {
+        $profile = auth()->user()->profile;
+        return view('dashboard', compact('user', 'profile'));
+    }
+
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(Profile $profile)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(ProfileUpdateRequest $request, Profile $profile): RedirectResponse
+    {
+        $request->profile()->fill($request->validated());
+        $request->profile()->views = 0;
+        $categories = Profile::$categories;
+        $locations = Profile::$locations;
+
+
 
         if ($request->hasFile('profile_photo')) {
-            $photoPath = $request->file('profile_photo')->store('profiles', 'public');
-            $request->user()->profile_photo = $photoPath;
+            $photoPath = $request->file('profile_photo')->store('accounts', 'public');
+            $request->profile()->profile_photo = $photoPath;
         }
 
-        session(['profileUpdateUsed' => true]);
+
         $request->user()->save();
-        $successMessage = 'Congratulations, ' . $student->name . '! Your profile was updated';
-        return Redirect::route('dashboard', compact('locations', 'categories'))
+        $successMessage = 'Congratulations, ' . $profile->name . '! Your account was updated';
+        return redirect()->route('dashboard', compact('locations', 'categories'))
             ->with('success', $successMessage);
     }
 
     /**
-     * Delete the user's account.
+     * Remove the specified resource from storage.
      */
-    public function destroy(Request $request): RedirectResponse
+    public function destroy(Profile $profile)
     {
-        $request->validateWithBag('userDeletion', [
-            'password' => ['required', 'current_password'],
-        ]);
-
-        $user = $request->user();
-
-        Auth::logout();
-
-        $user->delete();
-
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-
-        return Redirect::to('/');
+        //
     }
 }

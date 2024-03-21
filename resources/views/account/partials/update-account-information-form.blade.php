@@ -1,7 +1,7 @@
 <section>
     <header>
         <h2 class="text-lg font-medium text-gray-900">
-            {{ __('Profile Information') }}
+            {{ __('Account Information') }}
         </h2>
 
         <p class="mt-1 text-sm text-gray-600">
@@ -13,7 +13,7 @@
         @csrf
     </form>
 
-    <form method="post" action="{{ route('profile.update') }}" class="mt-6 space-y-6" enctype="multipart/form-data">
+    <form method="post" action="{{ route('account.update') }}" class="mt-6 space-y-6" enctype="multipart/form-data">
         @csrf
         @method('patch')
 
@@ -23,7 +23,7 @@
             <x-input-error class="mt-2" :messages="$errors->get('name')" />
         </div>
 
-        <div>
+        <!-- <div>
             <x-input-label for="last_name" :value="__('Last Name')" />
             <x-text-input id="last_name" name="last_name" type="text" class="mt-1 block w-full" :value="old('last_name', $user->last_name)" required autofocus autocomplete="last_name" />
             <x-input-error class="mt-2" :messages="$errors->get('last_name')" />
@@ -63,7 +63,7 @@
             <x-input-label for="profile_photo" :value="__('Profile photo')" />
             <x-text-input id="profile_photo" name="profile_photo" type="file" class="mt-1 block w-full" :value="old('profile_photo', $user->profile_photo)" required autofocus autocomplete="profile_photo" />
             <x-input-error class="mt-2" :messages="$errors->get('profile_photo')" />
-        </div>
+        </div> -->
 
         <div>
             <x-input-label for="email" :value="__('Email')" />
@@ -92,7 +92,7 @@
         <div class="flex items-center gap-4">
             <x-primary-button>{{ __('Save') }}</x-primary-button>
 
-            @if (session('status') === 'profile-updated')
+            @if (session('status') === 'account-updated')
             <p x-data="{ show: true }" x-show="show" x-transition x-init="setTimeout(() => show = false, 2000)" class="text-sm text-gray-600">{{ __('Saved.') }}</p>
             @endif
         </div>

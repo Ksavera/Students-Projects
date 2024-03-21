@@ -4,31 +4,34 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\ProjectStoreRequest;
 use App\Http\Requests\ProjectUpdateRequest;
+use App\Models\Profile;
 use App\Models\User;
 use App\Models\Project;
-use Illuminate\Support\Facades\Redirect;
+use App\View\Components\profiles;
 use Illuminate\Support\Facades\Storage;
 
 class ProjectController extends Controller
 {
     public function index()
     {
+
         $projects = Project::all();
-        $student = auth()->user();
-        return view('projects.index', compact('projects', 'student'));
+
+        return view('projects.index', compact('projects'));
     }
-    public function create(User $student)
+    public function create(Profile $profile)
     {
-        return view('projects.create', compact('student'));
+        $profile = auth()->user()->profile;
+        return view('projects.create', compact('profile'));
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(ProjectStoreRequest $request, User $student)
+    public function store(ProjectStoreRequest $request, Profile $profile)
     {
         $validatedData = $request->validated();
-        $validatedData['user_id'] = $student->id;
+        $validatedData['profile_id'] = $profile->id;
 
         if ($request->hasFile('project_photo')) {
             $photoPath = $request->file('project_photo')->store('projects', 'public');
@@ -38,10 +41,10 @@ class ProjectController extends Controller
 
         $project = Project::create($validatedData);
 
-        $successMessage = 'Congratulations, ' . $student->name . '! Your project was added';
+        $successMessage = 'Congratulations, ' . $profile->name . '! Your project was added';
 
         return redirect()
-            ->route('dashboard', ['student' => $student, 'project' => $project->id])
+            ->route('dashboard', ['profile' => $profile, 'project' => $project->id])
             ->with('success', $successMessage);
     }
 
@@ -49,20 +52,19 @@ class ProjectController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Project $project, User $student)
+    public function show(Project $project, Profile $profile)
     {
 
-        return view('projects.show', compact('project', 'student'));
+        return view('projects.show', compact('project', 'profile'));
     }
 
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(User $student, $id)
+    public function edit(Profile $profile, Project $project)
     {
-        $project = Project::findOrFail($id);
-        return view('projects.create', compact('student', 'project'));
+        return view('projects.create', compact('profile', 'project'));
     }
     /**
      * Update the specified resource in storage.
@@ -83,12 +85,12 @@ class ProjectController extends Controller
         $project->save();
 
         // Assuming you have a $student variable available, you can retrieve the student from the project
-        $student = $project->user;
+        $user = $project->user;
 
-        $successMessage = 'Congratulations, ' . $student->name . '! Your project was updated';
+        $successMessage = 'Congratulations, ' . $user->name . '! Your project was updated';
 
         return redirect()
-            ->route('projects.show', compact('project', 'student'))
+            ->route('projects.show', compact('project', 'user'))
             ->with('success', $successMessage);
     }
 
@@ -96,12 +98,12 @@ class ProjectController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(User $student, Project $project)
+    public function destroy(User $user, Project $project)
     {
-        // Find the project by its ID and make sure it belongs to the specified student
+        // Find the project by its ID and make sure it belongs to the specified user
 
         if (!$project) {
-            return redirect()->route('dashboard')->with('error', 'Project not found or does not belong to the student.');
+            return redirect()->route('dashboard')->with('error', 'Project not found or does not belong to the user.');
         }
         if ($project->project_photo) {
             Storage::disk('public')->delete($project->project_photo);
@@ -110,7 +112,7 @@ class ProjectController extends Controller
         $project->delete();
 
         // Construct the success message
-        $successMessage = 'Congratulations, ' . $student->name . '! Your project was deleted';
+        $successMessage = 'Congratulations, ' . $user->name . '! Your project was deleted';
 
         // Redirect back to the dashboard with the success message
         return redirect()->route('dashboard')

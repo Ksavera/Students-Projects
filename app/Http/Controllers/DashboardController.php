@@ -12,8 +12,9 @@ class DashboardController extends Controller
     public function index()
 
     {
-        $student = auth()->user();
-        $projects = $student->projects;
-        return view('dashboard', compact('student', 'projects'));
+        $profile = auth()->user()->profile;
+        $projects = $profile->projects;
+
+        return view('dashboard', compact('profile', 'projects'));
     }
 }

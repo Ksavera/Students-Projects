@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
-<form method="POST" action="{{ isset($project) ? route('projects.update', ['student' => $student->id, 'project' => $project->id]) : route('projects.store', ['student' => $student->id]) }}" enctype="multipart/form-data">
+<form method="POST" action="{{ isset($project) ? route('projects.update', ['profile' => $profile->id, 'project' => $project->id]) : route('projects.store', ['profile' => $profile->id]) }}" enctype="multipart/form-data">
     @csrf
     @isset($project)
     @method('PUT')
