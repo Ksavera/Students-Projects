@@ -7,7 +7,7 @@ use App\Http\Requests\ProjectUpdateRequest;
 use App\Models\Profile;
 use App\Models\User;
 use App\Models\Project;
-use App\View\Components\profiles;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 class ProjectController extends Controller
@@ -19,59 +19,68 @@ class ProjectController extends Controller
 
         return view('projects.index', compact('projects'));
     }
-    public function create(Profile $profile)
+    public function create()
     {
-        $profile = auth()->user()->profile;
-        return view('projects.create', compact('profile'));
+        return view('projects.create');
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(ProjectStoreRequest $request, Profile $profile)
+    public function store(ProjectStoreRequest $request)
     {
         $validatedData = $request->validated();
+
+        $profile = auth()->user()->profile;
+
         $validatedData['profile_id'] = $profile->id;
 
         if ($request->hasFile('project_photo')) {
             $photoPath = $request->file('project_photo')->store('projects', 'public');
-
             $validatedData['project_photo'] = $photoPath;
         }
 
         $project = Project::create($validatedData);
 
-        $successMessage = 'Congratulations, ' . $profile->name . '! Your project was added';
+        $successMessage = 'Congratulations! ' . $profile->user->name . ' Your project was added';
 
         return redirect()
-            ->route('dashboard', ['profile' => $profile, 'project' => $project->id])
+            ->route('dashboard', compact('profile', 'project'))
             ->with('success', $successMessage);
     }
+
+
+
 
 
     /**
      * Display the specified resource.
      */
-    public function show(Project $project, Profile $profile)
+    public function show(Project $project)
     {
 
-        return view('projects.show', compact('project', 'profile'));
+        return view('projects.show', compact('project'));
     }
 
+    public function showProfileProject(Profile $profile, Project $project)
+    {
+        return view('projects.show', compact('profile', 'project'));
+    }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Profile $profile, Project $project)
+    public function edit(Project $project)
     {
-        return view('projects.create', compact('profile', 'project'));
+
+        return view('projects.create', compact('project'));
     }
     /**
      * Update the specified resource in storage.
      */
-    public function update(ProjectUpdateRequest $request, Project $project, Profile $profile)
+    public function update(ProjectUpdateRequest $request, Project $project)
     {
-        $validatedData = $request->validated();
+        $project->fill($request->validated());
 
         if ($request->hasFile('project_photo')) {
             $photoPath = $request->file('project_photo')->store('projects', 'public');
@@ -79,18 +88,15 @@ class ProjectController extends Controller
         }
 
 
-
-        // Assuming you have a project instance available, you can update it like this:
-        $project->fill($validatedData);
         $project->save();
 
-        // Assuming you have a $student variable available, you can retrieve the student from the project
-        $user = $project->user;
 
-        $successMessage = 'Congratulations, ' . $profile->name . '! Your project was updated';
+        $profile = $project->profile()->with('user')->firstOrFail();
+
+        $successMessage = 'Congratulations, ' . $profile->user->name . '! Your project was updated';
 
         return redirect()
-            ->route('projects.show', compact('project', 'profile'))
+            ->route('projects.show', compact('project'))
             ->with('success', $successMessage);
     }
 
@@ -100,7 +106,7 @@ class ProjectController extends Controller
      */
     public function destroy(User $user, Project $project)
     {
-        // Find the project by its ID and make sure it belongs to the specified user
+        $user = Auth::user();
 
         if (!$project) {
             return redirect()->route('dashboard')->with('error', 'Project not found or does not belong to the user.');

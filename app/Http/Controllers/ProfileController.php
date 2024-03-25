@@ -7,7 +7,8 @@ use App\Http\Requests\ProfileUpdateRequest;
 use App\Models\Profile;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class ProfileController extends Controller
 {
@@ -25,9 +26,11 @@ class ProfileController extends Controller
      */
     public function create()
     {
-        return view('profiles.create');
-    }
+        $locations = Profile::$locations;
+        $categories = Profile::$categories;
 
+        return view('profiles.create', compact('locations', 'categories'));
+    }
     /**
      * Store a newly created resource in storage.
      */
@@ -44,19 +47,23 @@ class ProfileController extends Controller
 
             $profile = Profile::create($validatedData);
 
-            $successMessage = 'Congratulations, ' . $user->name . '! Your profile was created';
+            $successMessage = 'Congratulations, ' . $profile->user->name . '! Your profile was created';
 
             return redirect()
-                ->route('profiles.show', compact('user', 'profile'))
+                ->route('dashboard', compact('user', 'profile'))
                 ->with('success', $successMessage);
         }
     }
 
     public function show(Profile $profile)
     {
-        $projects = $profile->projects()->get();
         $profile->increment('views');
-        return view('dashboard', compact('projects', 'profile'));
+        $projects = $profile->projects()->get();
+        if (Auth::check() && Auth::user()->id === $profile->user_id) {
+            return view('dashboard', compact('projects', 'profile'));
+        } else {
+            return view('profiles.show', compact('projects', 'profile'));
+        }
     }
 
 
@@ -65,7 +72,9 @@ class ProfileController extends Controller
      */
     public function edit(Profile $profile)
     {
-        //
+        $locations = Profile::$locations;
+        $categories = Profile::$categories;
+        return view('profiles.create', compact('profile', 'locations', 'categories'));
     }
 
     /**
@@ -73,30 +82,35 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request, Profile $profile): RedirectResponse
     {
-        $request->profile()->fill($request->validated());
-        $request->profile()->views = 0;
-        $categories = Profile::$categories;
-        $locations = Profile::$locations;
+        $profile->fill($request->validated());
 
-
+        $profile->views = 0;
 
         if ($request->hasFile('profile_photo')) {
             $photoPath = $request->file('profile_photo')->store('accounts', 'public');
-            $request->profile()->profile_photo = $photoPath;
+            $profile->profile_photo = $photoPath;
         }
 
+        $profile->save();
 
-        $request->user()->save();
-        $successMessage = 'Congratulations, ' . $profile->name . '! Your account was updated';
-        return redirect()->route('dashboard', compact('locations', 'categories'))
-            ->with('success', $successMessage);
+        $successMessage = 'Congratulations, ' . $profile->user->name . '! Your account was updated';
+        return redirect()->route('dashboard')->with('success', $successMessage);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Profile $profile)
+    public function destroy(User $user, Profile $profile)
     {
-        //
+        $user = Auth::user();
+        if ($profile->profile_photo) {
+            Storage::disk('public')->delete($profile->profile_photo);
+        }
+        $profile->delete();
+
+        $successMessage = 'Congratulations, ' . $user->name . '! Your profile was deleted';
+
+        return redirect()->route('dashboard')
+            ->with('success', $successMessage);
     }
 }

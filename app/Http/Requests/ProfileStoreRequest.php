@@ -28,8 +28,8 @@ class ProfileStoreRequest extends FormRequest
             'linkedin' => ['required', 'string'],
             'github' => ['required', 'string'],
             'phone' => ['required', 'string'],
-            'category' => ['nullable', 'string'],
-            'location' => ['nullable', 'string'],
+            'category' => ['required', 'string'],
+            'location' => ['required', 'string'],
             'profile_photo' => ['required', 'image', 'mimes:jpg,png,jpeg', 'max:204800'],
         ];
     }

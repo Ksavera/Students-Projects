@@ -9,11 +9,7 @@
 
 
 <h1 class="text-center my-12">Users Dashboard where will be displayed his profile info and projects</h1>
-@if(!isset($profile) && auth())
-<p>There is no profile created.</p>
-<a href="{{route('profiles.create')}}" class="text-red-500">Create Profile</a>
 
-@else
 <div class="flex my-5 gap-5 justify-around">
     <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
         <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
@@ -40,18 +36,14 @@
         <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
             <div class="max-w-xl">
                 <div>
-                    <div class="mb-8 flex justify-center">
-                        <x-primary-button class="bg-blue-200">
-                            <a href="{{route('projects.create', ['profile'=>$profile])}}">Create project</a>
-                        </x-primary-button>
-                    </div>
+
                     <section>
                         <div>
                             <h2 class="my-12 text-2xl text-center">Projects:</h2>
                             <div class="grid grid-cols-4 gap-4">
                                 @forelse ($projects as $project)
                                 <div class="rounded-md border border-cyan-700 bg-white p-2 shadow-sm">
-                                    <a href="{{ route('projects.show', compact('project', 'profile'))}}">
+                                    <a href="{{ route('projects.show', ['profile' => $profile, 'project' => $project])}}">
                                         <img src="{{Storage::url($project->project_photo)}}" alt="{{$project->name}}">
                                         <h3 class="text-center">{{ $project->name}}</h3>
                                     </a>
@@ -69,7 +61,4 @@
         </div>
     </div>
 </div>
-
-@endif
-
 @endsection

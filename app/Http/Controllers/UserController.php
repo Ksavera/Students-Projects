@@ -13,11 +13,7 @@ use Illuminate\Support\Facades\Redirect;
 
 class UserController extends Controller
 {
-    public function index()
-    {
-        $students = Profile::all();
-        return view('students.index', compact('students'));
-    }
+
     public function edit(Request $request): View
     {
         return view('account.edit', [

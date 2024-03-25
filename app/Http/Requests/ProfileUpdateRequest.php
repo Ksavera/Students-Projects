@@ -11,7 +11,7 @@ class ProfileUpdateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,15 @@ class ProfileUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'last_name' => ['nullable', 'string', 'max:255'],
+            'about' => ['nullable', 'string', 'max:255'],
+            'skills' => ['nullable', 'string'],
+            'linkedin' => ['nullable', 'string'],
+            'github' => ['nullable', 'string'],
+            'phone' => ['nullable', 'string'],
+            'category' => ['nullable', 'string'],
+            'location' => ['nullable', 'string'],
+            'profile_photo' => ['nullable', 'image', 'mimes:jpg,png,jpeg', 'max:204800'],
         ];
     }
 }
